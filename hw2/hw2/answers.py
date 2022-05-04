@@ -10,14 +10,17 @@ math (delimited with $$).
 
 part1_q1 = r"""
 **Your answer:**
+1. A.
 
+Y shape = [N,out_feature] = $[64,512]$  
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+X shape = [N,in_feature]  = $[64,1024]$ 
+    
+Since the jacobian is constructed by the derivative of every element in the output according to every element in 
+the input the dimension that we will get is $[64\cdot512 , 64\cdot1024]$
+
+B.
+
 
 """
 
