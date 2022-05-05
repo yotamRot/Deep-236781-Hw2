@@ -10,7 +10,9 @@ math (delimited with $$).
 
 part1_q1 = r"""
 **Your answer:**
-1. A.
+1. 
+
+A.
 
 Y shape = [N,out_feature] = $[64,512]$  
 
@@ -21,7 +23,42 @@ the input the dimension that we will get is $[64\cdot512 , 64\cdot1024]$
 
 B.
 
+Since the layer is fully connected, every element in Y is connected to every element in X.
+Therefore since element i,j in jacobian represents derivative of Yi by Xj we will get relevant weight according 
+to the relation between X and Y. 
+So the matrix would **not be sparse** because we have a connection between every two elements in X and Y(the layer is fully connected).
+Then we will get a weight parameter (non zero value) in each element in jacobian.
 
+C. 
+Yes we have to materialize this jacobian because according to chain rule: $\delta\mat{X} =\pderiv{L}{\mat{Y}}\cdot\pderiv{\mat{Y}}{\mat{X}}$
+So as we can see although $\pderiv{L}{\mat{Y}}$ is given, $\pderiv{\mat{Y}}{\mat{X}}$ is still required to calculate $\delta\mat{X}$
+
+2.
+
+ A.
+
+Y shape = [N,out_feature] = $[64,512]$  
+
+W shape = [out_feature,in_feature]  = $[512,1024]$ 
+    
+Since the jacobian is constructed by the derivative of every element in the output according to every element in 
+the weight matrix the dimension that we will get is $[64\cdot512 , 512\cdot1024]$
+
+B.
+
+Since the layer is fully connected, every element in Y is connected to every element in X.
+
+Therefore since element i,j in jacobian represents derivative of Yi by Wij we will get relevant X according 
+to the relation between Yi and Wij (will give as Xj). 
+But for $Yk \neq Yi$  the derivative of Yk by Wij will give as 0 because this weight is not part of the connection between 
+Yk and Xj.
+Therefore the matrix **would be sparse** because only derivatives between some Yi element and weights that
+represents connection between same Yi and some X will not be zero. 
+So since many elements do not hold this connection we will get a lot of zeroes.
+
+C. 
+Yes we have to materialize this jacobian because according to chain rule: $\delta\mat{W} =\pderiv{L}{\mat{Y}}\cdot\pderiv{\mat{Y}}{\mat{W}}$
+So as we can see although $\pderiv{L}{\mat{Y}}$ is given ${\mat{Y}}{\mat{W}}$ is still required to calculate $\delta\mat{W}$
 """
 
 part1_q2 = r"""
