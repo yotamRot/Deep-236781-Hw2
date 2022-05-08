@@ -238,7 +238,7 @@ class Linear(Layer):
         # Initialize the weights to zero-mean gaussian noise with a standard
         # deviation of `wstd`. Init bias to zero.
         # ====== YOUR CODE: ======
-        self.w = torch.normal(mean=0, std=wstd, size=(out_features,in_features))
+        self.w = torch.normal(mean=0, std=wstd, size=(out_features, in_features))
         self.b = torch.zeros(size=(out_features,))
         # ========================
 
@@ -260,6 +260,7 @@ class Linear(Layer):
 
         # TODO: Compute the affine transform
         # ====== YOUR CODE: ======
+        x = x.reshape((x.shape[0], -1))
         out = torch.matmul(x, self.w.T) + self.b
         # ========================
 
