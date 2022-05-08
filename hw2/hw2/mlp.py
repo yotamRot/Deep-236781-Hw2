@@ -55,7 +55,23 @@ class MLP(nn.Module):
         #  - Either instantiate the activations based on their name or use the provided
         #    instances.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        super().__init__()
+        mlp_layers = [torch.nn.Linear(in_dim, dims[0], bias=True)]
+        if type(nonlins[0]) == str:
+            cur_non_lin = ACTIVATIONS[nonlins[0]]()
+        else:
+            cur_non_lin = nonlins[0]
+        mlp_layers.append(cur_non_lin)
+
+        for in_feature, out_feature, nonlin in zip(dims, dims[1:], nonlins[1:]):
+            mlp_layers.append(torch.nn.Linear(in_feature, out_feature, bias=True))
+            if type(nonlin) == str:
+                cur_non_lin = ACTIVATIONS[nonlin]()
+            else:
+                cur_non_lin = nonlin
+            mlp_layers.append(cur_non_lin)
+
+        self.mlp_layers = nn.Sequential(*mlp_layers)
         # ========================
 
     def forward(self, x: Tensor) -> Tensor:
@@ -66,5 +82,6 @@ class MLP(nn.Module):
         # TODO: Implement the model's forward pass. Make sure the input and output
         #  shapes are as expected.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        x_vec = x.view((x.shape[0], -1))
+        return self.mlp_layers(x_vec)
         # ========================
