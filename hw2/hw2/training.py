@@ -83,7 +83,13 @@ class Trainer(abc.ABC):
             #  - Use the train/test_epoch methods.
             #  - Save losses and accuracies in the lists above.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            epoch_train_loss, epoch_train_acc = self.train_epoch(dl_train)
+            train_acc.append(epoch_train_acc)
+            train_loss.append(torch.mean(epoch_train_loss))
+
+            epoch_test_loss, epoch_test_acc = self.test_epoch(dl_test)
+            train_acc.append(epoch_test_acc)
+            train_loss.append(torch.mean(epoch_test_loss))
             # ========================
 
             # TODO:
@@ -257,7 +263,14 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        y_score = self.model(X)
+        y_classify = self.model.classify(y_score)
+        batch_loss = self.loss_fn(y_classify, y)
+        self.optimizer.zero_grad()
+        self.loss_fn.backward()
+        self.optimizer.step()
+        num_correct = int(((y == y_classify).sum()))
+
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -277,7 +290,9 @@ class ClassifierTrainer(Trainer):
             #  - Forward pass
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            y_pred = self.model(X)
+            batch_loss = self.loss_fn(y_pred, y)
+            num_correct = int(((y == y_pred).sum()))
             # ========================
 
         return BatchResult(batch_loss, num_correct)
