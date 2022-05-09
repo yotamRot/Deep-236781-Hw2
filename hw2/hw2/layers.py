@@ -260,7 +260,7 @@ class Linear(Layer):
 
         # TODO: Compute the affine transform
         # ====== YOUR CODE: ======
-        x = x.reshape((x.shape[0], -1))
+        x = x.view((x.shape[0], -1))
         out = torch.matmul(x, self.w.T) + self.b
         # ========================
 
@@ -325,8 +325,8 @@ class CrossEntropyLoss(Layer):
         # TODO: Compute the cross entropy loss using the last formula from the
         #  notebook (i.e. directly using the class scores).
         # ====== YOUR CODE: ======
-        e = torch.sum(torch.exp(x), dim=1).reshape((-1, 1))
-        loss = -x[range(0, N), y].reshape((-1, 1)) + torch.log(e)
+        e = torch.sum(torch.exp(x), dim=1).view((-1, 1))
+        loss = -x[range(0, N), y].view((-1, 1)) + torch.log(e)
         loss = loss.mean()
         # ========================
 
@@ -346,7 +346,7 @@ class CrossEntropyLoss(Layer):
 
         # TODO: Calculate the gradient w.r.t. the input x.
         # ====== YOUR CODE: ======
-        e = torch.sum(torch.exp(x), dim=1).reshape((-1, 1))
+        e = torch.sum(torch.exp(x), dim=1).view((-1, 1))
         diff = torch.exp(x) / e
         diff[[range(0, N), y]] -= 1
         dx = diff/N
@@ -368,12 +368,17 @@ class Dropout(Layer):
         assert 0.0 <= p < 1.0
         self.p = p
 
+
     def forward(self, x, **kw):
         # TODO: Implement the dropout forward pass.
         #  Notice that contrary to previous layers, this layer behaves
         #  differently a according to the current training_mode (train/test).
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = x
+        if self.training_mode:
+            M = (torch.empty(x.size()).uniform_(0, 1) >= self.p)
+            self.grad_cache["drop_mat"] = M
+            out = torch.mul(x, M)
         # ========================
 
         return out
@@ -381,7 +386,9 @@ class Dropout(Layer):
     def backward(self, dout):
         # TODO: Implement the dropout backward pass.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        dx = dout
+        if self.training_mode:
+            dx = torch.mul(dout, self.grad_cache["drop_mat"])
         # ========================
 
         return dx
@@ -496,15 +503,16 @@ class MLP(Layer):
         layers.append(Linear(in_features, hidden_features[0]))
         if activation == 'relu':
             activation_func = ReLU
-        # elif activation is 'sigmoid':
         else:
             activation_func = Sigmoid
-        # for feature_index in len(hidden_features-1):
         for in_feature, out_feature in zip(hidden_features, hidden_features[1:]):
             layers.append(activation_func())
-            # layers.append(Linear(hidden_features[feature_index-1], hidden_features[feature_index]))
+            if dropout > 0:
+                layers.append(Dropout(dropout))
             layers.append(Linear(in_feature, out_feature))
         layers.append(activation_func())
+        if dropout > 0:
+            layers.append(Dropout(dropout))
         layers.append(Linear(hidden_features[-1], num_classes))
 
         # ========================
