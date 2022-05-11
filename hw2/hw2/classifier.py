@@ -135,7 +135,6 @@ class BinaryClassifier(Classifier):
         ones = torch.ones(size=(N,), dtype=torch.int)
         zeros = torch.zeros(size=(N,), dtype=torch.int)
         output = torch.where(positive_class_column > self.threshold, ones, zeros)
-        print(output)
         return output
         # ========================
 
@@ -185,7 +184,21 @@ def plot_decision_boundary_2d(
     #  plot a contour map.
     x1_grid, x2_grid, y_hat = None, None, None
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    x1_min, x1_max = min(x[:, 0]), max(x[:, 0])
+    x2_min, x2_max = min(x[:, 1]), max(x[:, 0])
+    step_x1 = int((x1_max - x1_min) / dx)
+    step_x2 = int((x2_max - x2_min) / dx)
+    x_line = torch.linspace(min(x[:, 0]), max(x[:, 0]), step_x1)
+    y_line = torch.linspace(min(x[:, 1]), max(x[:, 1]), step_x2)
+    x1_grid, x2_grid = torch.meshgrid(x_line, y_line)
+    x1_grid_vec = x1_grid.ravel()
+    x2_grid_vec = x2_grid.ravel()
+    print(x1_grid_vec.shape)
+    print(x2_grid_vec.shape)
+    grid = torch.dstack((x1_grid_vec, x2_grid_vec))
+    print(grid.shape)
+    classified = classifier(grid)
+    y_hat = classified.view(x1_grid.shape()).detach()
     # ========================
 
     # Plot the decision boundary as a filled contour

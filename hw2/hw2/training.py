@@ -263,14 +263,24 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        y_score = self.model(X)
-        y_classify = self.model.classify(y_score)
-        batch_loss = self.loss_fn(y_classify, y)
-        self.optimizer.zero_grad()
-        self.loss_fn.backward()
-        self.optimizer.step()
-        num_correct = int(((y == y_classify).sum()))
+        # y_score = self.model(X)
+        # print(y_score.dtype)
+        # print(y.dtype)
+        # y_classify = self.model.classify(y_score)
+        # batch_loss = self.loss_fn(y_score, y)
+        # self.optimizer.zero_grad()
+        # self.loss_fn.backward(batch_loss.backward())
+        # self.optimizer.step()
+        # num_correct = (((y == y_classify).sum()))
 
+        x_scores = self.model(X)
+        self.optimizer.zero_grad()
+        batch_loss = self.loss_fn(x_scores, y)
+        batch_loss.backward()
+        self.optimizer.step()
+        y_classify = self.model.classify(x_scores)
+        num_correct = int(((y == y_classify).sum()))
+        batch_loss = batch_loss.detach().numpy()
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -290,9 +300,11 @@ class ClassifierTrainer(Trainer):
             #  - Forward pass
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            y_pred = self.model(X)
-            batch_loss = self.loss_fn(y_pred, y)
-            num_correct = int(((y == y_pred).sum()))
+            x_scores = self.model(X)
+            batch_loss = self.loss_fn(x_scores, y)
+            y_classify = self.model.classify(x_scores)
+            num_correct = int(((y == y_classify).sum()))
+            batch_loss = batch_loss.detach().numpy()
             # ========================
 
         return BatchResult(batch_loss, num_correct)
