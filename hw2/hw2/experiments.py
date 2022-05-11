@@ -46,7 +46,49 @@ def mlp_experiment(
     #  Note: use print_every=0, verbose=False, plot=False where relevant to prevent
     #  output from this function.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    # torch.manual_seed(seed)
+    #
+    # hp_arch = part3_arch_hp()
+    hp_arch = dict(
+            n_layers=width,
+            hidden_dims=depth,
+            activation='relu',
+            out_activation='none',
+        )
+    hp_optim = dict(lr=0.1,
+                    weight_decay=0.05,
+                    momentum=0.1,
+                    loss_fn=torch.nn.CrossEntropyLoss())
+
+    model = BinaryClassifier(
+        model=MLP(
+            in_dim=2,
+            dims=[*[hp_arch['hidden_dims'], ] * hp_arch['n_layers'], 2],
+            nonlins=[*[hp_arch['activation'], ] * hp_arch['n_layers'], hp_arch['out_activation']]
+        ),
+        threshold=0.5,
+    )
+
+    loss_fn = hp_optim.pop('loss_fn')
+    optimizer = torch.optim.SGD(params=model.parameters(), **hp_optim)
+    trainer = ClassifierTrainer(model, loss_fn, optimizer)
+    _, _, _, _,  valid_acc = trainer.fit(dl_train, dl_test, num_epochs=n_epochs, print_every=0)
+
+    thresh = select_roc_thresh(model, *dl_valid.dataset.tensors, plot=False)
+    print(thresh)
+    model = BinaryClassifier(
+        model=MLP(
+            in_dim=2,
+            dims=[*[hp_arch['hidden_dims'], ] * hp_arch['n_layers'], 2],
+            nonlins=[*[hp_arch['activation'], ] * hp_arch['n_layers'], hp_arch['out_activation']]
+        ),
+        threshold=thresh,
+    )
+
+    _, _, _, _,  test_acc = trainer.fit(dl_train, dl_valid, num_epochs=n_epochs, print_every=0)
+
+    test_acc = sum(test_acc) / len(test_acc)
+    valid_acc = sum(valid_acc) / len(valid_acc)
     # ========================
     return model, thresh, valid_acc, test_acc
 

@@ -273,13 +273,15 @@ class ClassifierTrainer(Trainer):
         # self.optimizer.step()
         # num_correct = (((y == y_classify).sum()))
 
-        x_scores = self.model(X)
+        x_scores = self.model.forward(X)
         self.optimizer.zero_grad()
+
         batch_loss = self.loss_fn(x_scores, y)
         batch_loss.backward()
         self.optimizer.step()
-        y_classify = self.model.classify(x_scores)
+        y_classify = self.model.classify(X)
         num_correct = int(((y == y_classify).sum()))
+        # print(num_correct)
         batch_loss = batch_loss.detach().numpy()
         # ========================
 
@@ -301,8 +303,9 @@ class ClassifierTrainer(Trainer):
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
             x_scores = self.model(X)
+
             batch_loss = self.loss_fn(x_scores, y)
-            y_classify = self.model.classify(x_scores)
+            y_classify = self.model.classify(X)
             num_correct = int(((y == y_classify).sum()))
             batch_loss = batch_loss.detach().numpy()
             # ========================

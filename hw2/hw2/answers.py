@@ -186,9 +186,9 @@ def part3_arch_hp():
     # TODO: Tweak the MLP architecture hyperparameters.
     # ====== YOUR CODE: ======
     n_layers = 3
-    hidden_dims = 4
+    hidden_dims = 10
     activation = "relu"
-    out_activation = "tanh"
+    out_activation = "none"
     # ========================
     return dict(
         n_layers=n_layers,
