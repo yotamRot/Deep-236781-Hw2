@@ -196,9 +196,10 @@ def plot_decision_boundary_2d(
     print(x1_grid_vec.shape)
     print(x2_grid_vec.shape)
     grid = torch.dstack((x1_grid_vec, x2_grid_vec))
+    grid = grid.squeeze()
     print(grid.shape)
     classified = classifier(grid)
-    y_hat = classified.view(x1_grid.shape()).detach()
+    # y_hat = classified.view(x1_grid.shape()).detach()
     # ========================
 
     # Plot the decision boundary as a filled contour
