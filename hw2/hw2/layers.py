@@ -376,7 +376,7 @@ class Dropout(Layer):
         # ====== YOUR CODE: ======
         out = x
         if self.training_mode:
-            M = (torch.empty(x.size()).uniform_(0, 1) >= self.p)
+            M = (torch.empty(x.size()).uniform_(0, 1) >= self.p) / (1 - self.p)
             self.grad_cache["drop_mat"] = M
             out = torch.mul(x, M)
         # ========================
@@ -392,6 +392,7 @@ class Dropout(Layer):
         # ========================
 
         return dx
+
 
     def params(self):
         return []

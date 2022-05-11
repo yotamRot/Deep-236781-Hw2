@@ -83,11 +83,11 @@ class Trainer(abc.ABC):
             #  - Use the train/test_epoch methods.
             #  - Save losses and accuracies in the lists above.
             # ====== YOUR CODE: ======
-            epoch_train_loss, epoch_train_acc = self.train_epoch(dl_train)
+            epoch_train_loss, epoch_train_acc = self.train_epoch(dl_train, verbose=verbose, **kw)
             train_acc.append(epoch_train_acc)
             train_loss.append(sum(epoch_train_loss)/len(epoch_train_loss))
 
-            epoch_test_loss, epoch_test_acc = self.test_epoch(dl_test)
+            epoch_test_loss, epoch_test_acc = self.test_epoch(dl_test, verbose=verbose, **kw)
             test_acc.append(epoch_test_acc)
             test_loss.append(sum(epoch_test_loss)/len(epoch_test_loss))
             # ========================

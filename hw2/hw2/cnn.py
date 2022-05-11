@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 import itertools as it
 from torch import Tensor
 from typing import Sequence
@@ -80,8 +81,18 @@ class CNN(nn.Module):
         #  Note: If N is not divisible by P, then N mod P additional
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
-
+        iteration = 1
+        new_channels = self.channels
+        new_channels.insert(0, in_channels)
+        for in_channels, out_channels in zip(new_channels, new_channels[1:]):
+            layers.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, **self.conv_params))
+            # Apply activation function after each conv
+            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            #  Apply pooling to reduce dimensions after every P convolutions
+            #  CONV->ACTs should exist at the end, without a POOL after them.
+            if iteration % self.pool_every == 0:
+                layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+            iteration += 1
         # ========================
         seq = nn.Sequential(*layers)
         return seq
@@ -95,7 +106,8 @@ class CNN(nn.Module):
         rng_state = torch.get_rng_state()
         try:
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            model = self.feature_extractor(torch.randn(*self.in_size))
+            return np.prod(list(model.size()))
             # ========================
         finally:
             torch.set_rng_state(rng_state)
@@ -109,7 +121,11 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        activations = [ACTIVATIONS[self.activation_type]] * len(self.hidden_dims)
+        print(activations)
+        print(self.hidden_dims)
+        print(self.in_size)
+        mlp = MLP(self.in_size, self.hidden_dims, activations)
         # ========================
         return mlp
 
@@ -285,16 +301,16 @@ class YourCNN(CNN):
         """
         super().__init__(*args, **kwargs)
 
-        # TODO: Add any additional initialization as needed.
-        # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
-
-    # TODO: Change whatever you want about the CNN to try to
-    #  improve it's results on CIFAR-10.
-    #  For example, add batchnorm, dropout, skip connections, change conv
-    #  filter sizes etc.
-    # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    #     # TODO: Add any additional initialization as needed.
+    #     # ====== YOUR CODE: ======
+    #     raise NotImplementedError()
+    #     # ========================
+    #
+    # # TODO: Change whatever you want about the CNN to try to
+    # #  improve it's results on CIFAR-10.
+    # #  For example, add batchnorm, dropout, skip connections, change conv
+    # #  filter sizes etc.
+    # # ====== YOUR CODE: ======
+    # raise NotImplementedError()
 
     # ========================
