@@ -106,7 +106,7 @@ class CNN(nn.Module):
         rng_state = torch.get_rng_state()
         try:
             # ====== YOUR CODE: ======
-            model = self.feature_extractor(torch.randn(*self.in_size))
+            model = self.feature_extractor(torch.zeros(1, *self.in_size))
             return np.prod(list(model.size()))
             # ========================
         finally:
@@ -121,11 +121,9 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        activations = [ACTIVATIONS[self.activation_type]] * len(self.hidden_dims)
-        print(activations)
-        print(self.hidden_dims)
-        print(self.in_size)
-        mlp = MLP(self.in_size, self.hidden_dims, activations)
+        activations = [ACTIVATIONS[self.activation_type](**ACTIVATION_DEFAULT_KWARGS[self.activation_type])] * len(self.hidden_dims)
+
+        mlp = MLP(in_dim=self._n_features(), dims=self.hidden_dims, nonlins=activations)
         # ========================
         return mlp
 
@@ -135,7 +133,11 @@ class CNN(nn.Module):
         #  return class scores.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+
+
+        features = self.feature_extractor(x)
+        features = features.view(features.size(0), -1)
+        out = self._make_mlp(features)
         # ========================
         return out
 

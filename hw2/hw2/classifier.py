@@ -191,18 +191,21 @@ def plot_decision_boundary_2d(
     x1_grid, x2_grid, y_hat = None, None, None
     # ====== YOUR CODE: ======
     x1_min, x1_max = min(x[:, 0]), max(x[:, 0])
-    x2_min, x2_max = min(x[:, 1]), max(x[:, 0])
+    x2_min, x2_max = min(x[:, 1]), max(x[:, 1])
     step_x1 = int((x1_max - x1_min) / dx)
     step_x2 = int((x2_max - x2_min) / dx)
     x_line = torch.linspace(min(x[:, 0]), max(x[:, 0]), step_x1)
     y_line = torch.linspace(min(x[:, 1]), max(x[:, 1]), step_x2)
-    x1_grid, x2_grid = torch.meshgrid(x_line, y_line)
+
+    x1_grid, x2_grid = torch.meshgrid(x_line, y_line, indexing='xy')
     x1_grid_vec = x1_grid.ravel()
     x2_grid_vec = x2_grid.ravel()
     grid = torch.dstack((x1_grid_vec, x2_grid_vec))
     grid = grid.squeeze()
-    y_hat = classifier.classify(grid).detach()
+
+    y_hat = classifier.classify(grid)
     y_hat = y_hat.view(x1_grid.shape)
+
 
     # ========================
 
@@ -240,27 +243,12 @@ def select_roc_thresh(
     y_score = classifier.predict_proba(x).detach().numpy()
     y_score = y_score[:, classifier.positive_class: classifier.positive_class + 1]
     fpr, tpr, thresh = roc_curve(y_true=y, y_score=y_score, pos_label=classifier.positive_class)
-    # print(thresh)
+
     thresh = thresh[1:]
-    # print(thresh)
-    # tpr_index = np.argmax(tpr)
-    # fpr_index = np.argmin(fpr)
-    # if fpr[fpr_index] < 1-tpr[tpr_index]:
-    #     optimal_thresh_idx = fpr_index
-    #     optimal_thresh = fpr[fpr_index]
-    # else:
-    #     optimal_thresh_idx = tpr_index
-    #     optimal_thresh = tpr[tpr_index]
 
     optimal_thresh_idx = np.argmax(tpr - fpr)
     optimal_thresh = thresh[optimal_thresh_idx]
 
-    # optimal_thresh_idx = np.argmin(fpr + (1-tpr))
-    # optimal_thresh = thresh[optimal_thresh_idx]
-    # print(fpr_index)
-    # print(tpr_index)
-    # print(thresh)
-    # print(tpr)
     # ========================
 
     if plot:
