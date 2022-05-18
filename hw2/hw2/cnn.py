@@ -196,8 +196,30 @@ class ResidualBlock(nn.Module):
         #  - Don't create layers which you don't use! This will prevent
         #    correct comparison in the test.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        # ========================
+        layers_main = []
+        layers_shortcut = []
+        iteration = 1
+        activation = ACTIVATIONS[activation_type](**{**ACTIVATION_DEFAULT_KWARGS[activation_type], **activation_params})
+        new_channels = self.channels
+        new_channels.insert(0, in_channels)
+        for in_channels, out_channels, kernel_size in zip(new_channels, new_channels[1:], kernel_sizes):
+            layers_main.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, padding=kernel_size//2))
+
+            if dropout > 0:
+                layers_main.append(nn.Dropout(dropout))
+
+            if batchnorm is True:
+                layers_main.append(nn.norm(in_channels))
+
+            layers_main.append(activation)
+        self.main_path = nn.Sequential(*layers_main)
+
+        if in_channels == channels[-1]:
+            layers_shortcut = [nn.Identity()]
+        else:
+            layers_shortcut = [nn.Conv2d(in_channels, channels[-1], bias=False, kernel_size=1)]
+
+        self.shortcut_path = nn.Sequential(*layers_shortcut)
 
     def forward(self, x: Tensor):
         # TODO: Implement the forward pass. Save the main and residual path to `out`.
@@ -304,7 +326,7 @@ class YourCNN(CNN):
 
     #     # TODO: Add any additional initialization as needed.
     #     # ====== YOUR CODE: ======
-    #     raise NotImplementedError()
+        raise NotImplementedError()
     #     # ========================
     #
     # # TODO: Change whatever you want about the CNN to try to
@@ -312,6 +334,6 @@ class YourCNN(CNN):
     # #  For example, add batchnorm, dropout, skip connections, change conv
     # #  filter sizes etc.
     # # ====== YOUR CODE: ======
-    # raise NotImplementedError()
+    raise NotImplementedError()
 
     # ========================
