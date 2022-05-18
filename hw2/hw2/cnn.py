@@ -84,6 +84,7 @@ class CNN(nn.Module):
         iteration = 1
         new_channels = self.channels
         new_channels.insert(0, in_channels)
+        # new_channels.insert(-1, self.out_classes)
         for in_channels, out_channels in zip(new_channels, new_channels[1:]):
             layers.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, **self.conv_params))
             # Apply activation function after each conv
@@ -121,9 +122,9 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        activations = [ACTIVATIONS[self.activation_type](**ACTIVATION_DEFAULT_KWARGS[self.activation_type])] * len(self.hidden_dims)
+        activations = [ACTIVATIONS[self.activation_type](**{**ACTIVATION_DEFAULT_KWARGS[self.activation_type], **self.activation_params})] * len(self.hidden_dims) + [ACTIVATIONS['none'](**ACTIVATION_DEFAULT_KWARGS['none'])]
 
-        mlp = MLP(in_dim=self._n_features(), dims=self.hidden_dims, nonlins=activations)
+        mlp = MLP(in_dim=self._n_features(), dims=self.hidden_dims + [self.out_classes], nonlins=activations)
         # ========================
         return mlp
 
@@ -133,11 +134,9 @@ class CNN(nn.Module):
         #  return class scores.
         out: Tensor = None
         # ====== YOUR CODE: ======
-
-
         features = self.feature_extractor(x)
         features = features.view(features.size(0), -1)
-        out = self._make_mlp(features)
+        out = self.mlp.forward(features)
         # ========================
         return out
 

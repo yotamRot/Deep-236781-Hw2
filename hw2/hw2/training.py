@@ -85,11 +85,11 @@ class Trainer(abc.ABC):
             # ====== YOUR CODE: ======
             epoch_train_loss, epoch_train_acc = self.train_epoch(dl_train, verbose=verbose, **kw)
             train_acc.append(epoch_train_acc)
-            train_loss.append(sum(epoch_train_loss)/len(epoch_train_loss))
+            train_loss.append((sum(epoch_train_loss)/len(epoch_train_loss)).item())
 
             epoch_test_loss, epoch_test_acc = self.test_epoch(dl_test, verbose=verbose, **kw)
             test_acc.append(epoch_test_acc)
-            test_loss.append(sum(epoch_test_loss)/len(epoch_test_loss))
+            test_loss.append((sum(epoch_test_loss)/len(epoch_test_loss)).item())
             # ========================
 
             # TODO:
@@ -263,15 +263,6 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        # y_score = self.model(X)
-        # print(y_score.dtype)
-        # print(y.dtype)
-        # y_classify = self.model.classify(y_score)
-        # batch_loss = self.loss_fn(y_score, y)
-        # self.optimizer.zero_grad()
-        # self.loss_fn.backward(batch_loss.backward())
-        # self.optimizer.step()
-        # num_correct = (((y == y_classify).sum()))
 
         x_scores = self.model.forward(X)
         self.optimizer.zero_grad()
@@ -282,7 +273,7 @@ class ClassifierTrainer(Trainer):
         y_classify = self.model.classify(X)
         num_correct = int(((y == y_classify).sum()))
         # print(num_correct)
-        batch_loss = batch_loss.detach().numpy()
+        # batch_loss = batch_loss.detach()
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -307,7 +298,7 @@ class ClassifierTrainer(Trainer):
             batch_loss = self.loss_fn(x_scores, y)
             y_classify = self.model.classify(X)
             num_correct = int(((y == y_classify).sum()))
-            batch_loss = batch_loss.detach().numpy()
+            # batch_loss = batch_loss.detach()
             # ========================
 
         return BatchResult(batch_loss, num_correct)
