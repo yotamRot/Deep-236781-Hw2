@@ -20,17 +20,17 @@ class CNN(nn.Module):
     """
 
     def __init__(
-        self,
-        in_size,
-        out_classes: int,
-        channels: Sequence[int],
-        pool_every: int,
-        hidden_dims: Sequence[int],
-        conv_params: dict = {},
-        activation_type: str = "relu",
-        activation_params: dict = {},
-        pooling_type: str = "max",
-        pooling_params: dict = {},
+            self,
+            in_size,
+            out_classes: int,
+            channels: Sequence[int],
+            pool_every: int,
+            hidden_dims: Sequence[int],
+            conv_params: dict = {},
+            activation_type: str = "relu",
+            activation_params: dict = {},
+            pooling_type: str = "max",
+            pooling_params: dict = {},
     ):
         """
         :param in_size: Size of input images, e.g. (C,H,W).
@@ -122,7 +122,9 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        activations = [ACTIVATIONS[self.activation_type](**{**ACTIVATION_DEFAULT_KWARGS[self.activation_type], **self.activation_params})] * len(self.hidden_dims) + [ACTIVATIONS['none'](**ACTIVATION_DEFAULT_KWARGS['none'])]
+        activations = [ACTIVATIONS[self.activation_type](
+            **{**ACTIVATION_DEFAULT_KWARGS[self.activation_type], **self.activation_params})] * len(
+            self.hidden_dims) + [ACTIVATIONS['none'](**ACTIVATION_DEFAULT_KWARGS['none'])]
 
         mlp = MLP(in_dim=self._n_features(), dims=self.hidden_dims + [self.out_classes], nonlins=activations)
         # ========================
@@ -147,15 +149,15 @@ class ResidualBlock(nn.Module):
     """
 
     def __init__(
-        self,
-        in_channels: int,
-        channels: Sequence[int],
-        kernel_sizes: Sequence[int],
-        batchnorm: bool = False,
-        dropout: float = 0.0,
-        activation_type: str = "relu",
-        activation_params: dict = {},
-        **kwargs,
+            self,
+            in_channels: int,
+            channels: Sequence[int],
+            kernel_sizes: Sequence[int],
+            batchnorm: bool = False,
+            dropout: float = 0.0,
+            activation_type: str = "relu",
+            activation_params: dict = {},
+            **kwargs,
     ):
         """
         :param in_channels: Number of input channels to the first convolution.
@@ -174,7 +176,8 @@ class ResidualBlock(nn.Module):
         """
         super().__init__()
         assert channels and kernel_sizes
-        assert len(channels) == len(kernel_sizes)
+
+        assert len(channels) == len(kernel_sizes), f"{(channels)} == {(kernel_sizes)}"
         assert all(map(lambda x: x % 2 == 1, kernel_sizes))
 
         if activation_type not in ACTIVATIONS:
@@ -197,27 +200,32 @@ class ResidualBlock(nn.Module):
         #    correct comparison in the test.
         # ====== YOUR CODE: ======
         layers_main = []
-        layers_shortcut = []
-        iteration = 1
         activation = ACTIVATIONS[activation_type](**{**ACTIVATION_DEFAULT_KWARGS[activation_type], **activation_params})
-        new_channels = self.channels
-        new_channels.insert(0, in_channels)
-        for in_channels, out_channels, kernel_size in zip(new_channels, new_channels[1:], kernel_sizes):
-            layers_main.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, padding=kernel_size//2))
+        padding = kernel_sizes[0] // 2
+        layers_main.append(
+            nn.Conv2d(in_channels=in_channels, out_channels=channels[0], kernel_size=kernel_sizes[0], padding=padding))
+
+        for in_channel, out_channel, kernel_size in zip(channels, channels[1:], kernel_sizes[1:]):
 
             if dropout > 0:
-                layers_main.append(nn.Dropout(dropout))
+                layers_main.append(nn.Dropout2d(dropout))
 
             if batchnorm is True:
-                layers_main.append(nn.norm(in_channels))
+                layers_main.append(nn.BatchNorm2d(in_channel))
 
             layers_main.append(activation)
+
+            padding = kernel_size // 2
+            layers_main.append(
+                nn.Conv2d(in_channels=in_channel, out_channels=out_channel, kernel_size=kernel_size,
+                          padding=padding))
+
         self.main_path = nn.Sequential(*layers_main)
 
         if in_channels == channels[-1]:
             layers_shortcut = [nn.Identity()]
         else:
-            layers_shortcut = [nn.Conv2d(in_channels, channels[-1], bias=False, kernel_size=1)]
+            layers_shortcut = [nn.Conv2d(in_channels=in_channels, out_channels=channels[-1], bias=False, kernel_size=1)]
 
         self.shortcut_path = nn.Sequential(*layers_shortcut)
 
@@ -225,7 +233,9 @@ class ResidualBlock(nn.Module):
         # TODO: Implement the forward pass. Save the main and residual path to `out`.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out_main = self.main_path(x)
+        out_short = self.shortcut_path(x)
+        out = out_main + out_short
         # ========================
         out = torch.relu(out)
         return out
@@ -237,11 +247,11 @@ class ResidualBottleneckBlock(ResidualBlock):
     """
 
     def __init__(
-        self,
-        in_out_channels: int,
-        inner_channels: Sequence[int],
-        inner_kernel_sizes: Sequence[int],
-        **kwargs,
+            self,
+            in_out_channels: int,
+            inner_channels: Sequence[int],
+            inner_kernel_sizes: Sequence[int],
+            **kwargs,
     ):
         """
         :param in_out_channels: Number of input and output channels of the block.
@@ -265,22 +275,24 @@ class ResidualBottleneckBlock(ResidualBlock):
         #  Initialize the base class in the right way to produce the bottleneck block
         #  architecture.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        new_channels = [inner_channels[0]] + inner_channels + [in_out_channels]
+        new_kernels = [1] + inner_kernel_sizes + [1]
+        super().__init__(in_channels=in_out_channels, channels=new_channels, kernel_sizes=new_kernels, **kwargs)
         # ========================
 
 
 class ResNet(CNN):
     def __init__(
-        self,
-        in_size,
-        out_classes,
-        channels,
-        pool_every,
-        hidden_dims,
-        batchnorm=False,
-        dropout=0.0,
-        bottleneck: bool = False,
-        **kwargs,
+            self,
+            in_size,
+            out_classes,
+            channels,
+            pool_every,
+            hidden_dims,
+            batchnorm=False,
+            dropout=0.0,
+            bottleneck: bool = False,
+            **kwargs,
     ):
         """
         See arguments of CNN & ResidualBlock.
@@ -311,7 +323,29 @@ class ResNet(CNN):
         #  - Use bottleneck blocks if requested and if the number of input and output
         #    channels match for each group of P convolutions.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        new_channels = self.channels
+        new_channels.insert(0, in_channels)
+        residuals_kernels = self.pool_every * [3]
+        # new_channels.insert(-1, self.out_classes)
+        iter = 0
+        while iter < len(new_channels) - self.pool_every:
+            cur_in = new_channels[iter]
+            cur_channels = new_channels[iter + 1:iter + 1 + self.pool_every]
+            # print(cur_channels)
+            layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
+                                        kernel_sizes=residuals_kernels, batchnorm=self.batchnorm, dropout=self.dropout))
+            layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+            iter = iter + self.pool_every
+
+        if iter < len(new_channels):
+            cur_in = new_channels[iter]
+            cur_channels = new_channels[iter + 1:]
+            print(cur_channels)
+            residuals_kernels = len(cur_channels) * [3]
+            print(residuals_kernels)
+
+            layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
+                                        kernel_sizes=residuals_kernels, batchnorm=self.batchnorm, dropout=self.dropout))
         # ========================
         seq = nn.Sequential(*layers)
         return seq
@@ -324,9 +358,11 @@ class YourCNN(CNN):
         """
         super().__init__(*args, **kwargs)
 
-    #     # TODO: Add any additional initialization as needed.
-    #     # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        #     # TODO: Add any additional initialization as needed.
+        #     # ====== YOUR CODE: ======
+        print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA NEED TO IMP YourCNN")
+
+    #     raise NotImplementedError()
     #     # ========================
     #
     # # TODO: Change whatever you want about the CNN to try to
@@ -334,6 +370,5 @@ class YourCNN(CNN):
     # #  For example, add batchnorm, dropout, skip connections, change conv
     # #  filter sizes etc.
     # # ====== YOUR CODE: ======
-    raise NotImplementedError()
-
+    print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA NEED TO DO YourCNN")
     # ========================
