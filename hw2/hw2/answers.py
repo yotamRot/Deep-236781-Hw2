@@ -139,18 +139,30 @@ part2_q1 = r"""
 1. The purpose of dropout is to prevent over-fitting to our train data.
 
 In the graphs we can see that:
+
 not using dropout:
+
 -give us high accuracy and low loss on the train set but it gives us bad results at the test set since we over-fit.
+
 using dropout:
+
 In general we expect to see an improvement on test set, but to get worst result on train set.
+
 As we can see:
--low dropout give us good result on test set - meaning we improved the over-fitting issue on the train set.  
--high dropout decrease the over-fit as we can see in the graph, but since high dropout result that are worse then low dropout (both on train and test)
- we can understand that we under-fit our data in the training process because we removed too many samples.
+
+-low dropout give us good result on test set - meaning we improved the over-fitting issue on the train set.
+  
+-high dropout decrease the over-fit as we can see in the graph, but since high dropout result that are worse then low
+ dropout (both on train and test) we can understand that we under-fit our data in the training process because we 
+ ignored too many neurons.
  
  **this is what we expected to see**, using dropout can improve our test results by decreasing the over-fitting 
- on the train set. But the choice of parameter dropout should be made carefully.
+ on the train set, But the choice of parameter dropout should be made carefully.
+ 
+2. as explained at 1. both dropout decrease the over-fitting on the train set, but low dropout gives better results both
+on train and test. 
 
+That's because using high dropout might cause under-fitting to our data meaning we cannot generalize new data.    
 
 
 """
@@ -158,26 +170,43 @@ As we can see:
 part2_q2 = r"""
 **Your answer:**
 
+**Yes it is possible.**
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Cross-entropy is evaluated loss while considering scores for all labels and the ground true. 
+on the other hand, accuracy depends only on the highest score label and the ground true.
+
+For example: Suppose we have 2 classes triangle and circle, and the data is circle, circle.
+for first input:
+So we might get the output scores triangle: 0.1, circle: 0.9, than the cross-entropy loss is ~0.152 and the prediction 
+is correct.
+for second input:
+we might get the output scores triangle: 0.51, circle: 0.49, than the cross-entropy loss is ~1.029 and the prediction 
+isn't correct
+
+We will get accuracy of 50% and average loss of ~0.5905.
+
+In second epoch:
+And for both inputs the output scores: triangle: 0.4, circle: 0.6, than the cross-entropy loss is ~0.736 and the 
+prediction is correct.
+
+We will get accuracy of 100% and average loss of ~0.736.
+
+As we can see both prediction are correct and both accuracy and loss result increased. 
+
 
 """
 
 part2_q3 = r"""
 **Your answer:**
 
+1. Gradient decent is an optimization method used to minimized function by repeatedly moving to the direction opposite
+to the gradient.
+On the other hand backpropagation is an efficient way of computing gradients.
+Therefore the main difference is that gradient decent is a method to find the minimum and backpropagation is an 
+efficient way that might be used by gradient decent to find the direction to the minimum efficiently from a given 
+location.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+
 
 """
 
