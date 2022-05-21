@@ -154,18 +154,19 @@ def cnn_experiment(
 
     tmpX, tmpY = ds_train[0]
     in_size, out_size = tmpX.shape, 10
+    channels = [f for f in filters_per_layer for _ in range(layers_per_block)]
+    
+    pooling_params = dict(kernel_size=2)
+    conv_params = dict(kernel_size=3, padding=1)
+    
     model_parmas = dict(
-        # create 64->16->64 bottlenecks
-        in_size=in_size, out_classes=out_size, channels=[64, 16, 64] * 4,
-        pool_every=3, hidden_dims=[64] * 1,
-        activation_type='tanh',
-        pooling_type='max', pooling_params=dict(kernel_size=2),
-        batchnorm=True, dropout=0.1,
-        bottleneck=True
+        in_size=in_size, out_classes=out_size, channels=channels,
+        pool_every=pool_every, hidden_dims=hidden_dims,
+        pooling_params=pooling_params, conv_params=conv_params
     )
 
-    hp_optim = dict(lr=0.04,
-                    weight_decay=0.002,
+    hp_optim = dict(lr=lr,
+                    weight_decay=reg,
                     momentum=0.9,
                     loss_fn=torch.nn.CrossEntropyLoss())
 
@@ -179,9 +180,10 @@ def cnn_experiment(
     classifier_model = ArgMaxClassifier(model=model)
 
     loss_fn = hp_optim.pop('loss_fn')
-    optimizer = torch.optim.SGD(params=model.parameters(), **hp_optim)
-    trainer = ClassifierTrainer(classifier_model, loss_fn, optimizer)
-    fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs,early_stopping=early_stopping, checkpoints=checkpoints, **kw)
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
+    print(device)
+    trainer = ClassifierTrainer(classifier_model, loss_fn, optimizer, device)
+    fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints, **kw)
 
     # ========================
 
@@ -200,7 +202,7 @@ def save_experiment(run_name, out_dir, cfg, fit_res):
     with open(output_filename, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"*** Output file {output_filename} written")
+    print(f"* Output file {output_filename} written")
 
 
 def load_experiment(filename):
@@ -326,6 +328,7 @@ def parse_cli():
         p.print_help()
         sys.exit()
     return parsed
+
 
 
 if __name__ == "__main__":
