@@ -107,7 +107,10 @@ def cnn_experiment(
     hidden_dims=[1024],
     model_type="cnn",
     # You can add extra configuration for your experiments here
+    pooling_params=dict(kernel_size=2),
+    conv_params=dict(kernel_size=3, padding=1),
     **kw,
+
 ):
     """
     Executes a single run of a Part3 experiment with a single configuration.
@@ -154,21 +157,15 @@ def cnn_experiment(
 
     tmpX, tmpY = ds_train[0]
     in_size, out_size = tmpX.shape, 10
-    channels = [f for f in filters_per_layer for _ in range(layers_per_block)]
-    
-    pooling_params = dict(kernel_size=2)
-    conv_params = dict(kernel_size=3, padding=1)
-    
+
+    channels = [block_filter for block_filter in filters_per_layer for _ in range(layers_per_block)]
+
     model_parmas = dict(
         in_size=in_size, out_classes=out_size, channels=channels,
         pool_every=pool_every, hidden_dims=hidden_dims,
         pooling_params=pooling_params, conv_params=conv_params
     )
 
-    hp_optim = dict(lr=lr,
-                    weight_decay=reg,
-                    momentum=0.9,
-                    loss_fn=torch.nn.CrossEntropyLoss())
 
     if model_type == "cnn":
         model = CNN(**model_parmas)
@@ -179,7 +176,7 @@ def cnn_experiment(
 
     classifier_model = ArgMaxClassifier(model=model)
 
-    loss_fn = hp_optim.pop('loss_fn')
+    loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
     print(device)
     trainer = ClassifierTrainer(classifier_model, loss_fn, optimizer, device)
