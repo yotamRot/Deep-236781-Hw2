@@ -64,13 +64,15 @@ So as we can see although $\pderiv{L}{\mat{Y}}$ is given ${\mat{Y}}{\mat{W}}$ is
 part1_q2 = r"""
 **Your answer:**
 
+As we have learned the purpose of the gradient decent is to find the minimum of the loss function. 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+As we saw at the tutorial "Back-propagation is an efficient way to calculate these gradients using the chain rule".
+
+Therefore it is just a method and another methods can be used so it is **not required**.
+
+Alternatively the gradient can be simply computed invoking the chain rule, but it wouldn't be efficient.
+
+Another way that we found is in the following article: https://arxiv.org/abs/2202.08587 .
 
 """
 
@@ -134,13 +136,20 @@ def part2_dropout_hp():
 part2_q1 = r"""
 **Your answer:**
 
+1. The purpose of dropout is to prevent over-fitting to our train data.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+In the graphs we can see that:
+not using dropout:
+-give us high accuracy and low loss at the train set but it gives us bad results at the test set (over-fit).
+using dropout:
+-low dropout give us good result on test set - meaning we improved the over-fit on the train set.  
+-high dropout decrease the over-fit as we can see at the graph but since we have result that are worse then low dropout
+ we can understand that we under-fit our data in the training process because we removed too many samples.
+ 
+ **this is what we expected to see** that using dropout we can improve our test results by decreasing the over-fitting 
+ on the train set.
+
+
 
 """
 
