@@ -140,14 +140,16 @@ part2_q1 = r"""
 
 In the graphs we can see that:
 not using dropout:
--give us high accuracy and low loss at the train set but it gives us bad results at the test set (over-fit).
+-give us high accuracy and low loss on the train set but it gives us bad results at the test set since we over-fit.
 using dropout:
--low dropout give us good result on test set - meaning we improved the over-fit on the train set.  
--high dropout decrease the over-fit as we can see at the graph but since we have result that are worse then low dropout
+In general we expect to see an improvement on test set, but to get worst result on train set.
+As we can see:
+-low dropout give us good result on test set - meaning we improved the over-fitting issue on the train set.  
+-high dropout decrease the over-fit as we can see in the graph, but since high dropout result that are worse then low dropout (both on train and test)
  we can understand that we under-fit our data in the training process because we removed too many samples.
  
- **this is what we expected to see** that using dropout we can improve our test results by decreasing the over-fitting 
- on the train set.
+ **this is what we expected to see**, using dropout can improve our test results by decreasing the over-fitting 
+ on the train set. But the choice of parameter dropout should be made carefully.
 
 
 
