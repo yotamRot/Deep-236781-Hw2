@@ -46,7 +46,7 @@ def mlp_experiment(
     #  Note: use print_every=0, verbose=False, plot=False where relevant to prevent
     #  output from this function.
     # ====== YOUR CODE: ======
-    # torch.manual_seed(seed)
+    torch.manual_seed(seed)
     #
     # hp_arch = part3_arch_hp()
     hp_arch = dict(
@@ -89,14 +89,14 @@ def mlp_experiment(
 def cnn_experiment(
     run_name,
     out_dir="./results",
-    seed=None,
+    seed=0,
     device=None,
     # Training params
     bs_train=128,
     bs_test=None,
     batches=100,
     epochs=100,
-    early_stopping=3,
+    early_stopping=8,
     checkpoints=None,
     lr=1e-3,
     reg=1e-3,
@@ -109,6 +109,9 @@ def cnn_experiment(
     # You can add extra configuration for your experiments here
     pooling_params=dict(kernel_size=2),
     conv_params=dict(kernel_size=3, padding=1),
+    dropout=0.1,
+    batchnorm=True,
+    bottleneck=False,
     **kw,
 
 ):
@@ -146,12 +149,6 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
-    # hp_arch = dict(
-    #     n_layers=depth,
-    #     hidden_dims=width,
-    #     activation='tanh',
-    #     out_activation='none',
-    # )
     dl_test = DataLoader(ds_test, bs_test, shuffle=True)
     dl_train = DataLoader(ds_train, bs_train, shuffle=False)
 
@@ -165,8 +162,8 @@ def cnn_experiment(
             in_size=in_size, out_classes=out_size, channels=channels,
             pool_every=pool_every, hidden_dims=hidden_dims,
             pooling_params=pooling_params, conv_params=conv_params,
-            batchnorm=True, dropout=0.1,
-            bottleneck=True
+            batchnorm=batchnorm, dropout=dropout,
+            bottleneck=bottleneck
         )
     else:
         model_parmas = dict(
@@ -187,7 +184,6 @@ def cnn_experiment(
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
-    print(device)
     trainer = ClassifierTrainer(classifier_model, loss_fn, optimizer, device)
     fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints, **kw)
 

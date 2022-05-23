@@ -415,18 +415,18 @@ class YourCNN(CNN):
         cur_in = in_channels
         cur_channels = self.channels[:self.pool_every]
         while iterator <= len(self.channels) - self.pool_every:
-            # if self.bottleneck and cur_in == cur_channels[-1]:
-            #     layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
-            #                                           inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm,
-            #                                           dropout=self.dropout,
-            #                                           activation_type=self.activation_type,
-            #                                           activation_params=self.activation_params))
-            # else:
-            layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
-                                        kernel_sizes=residuals_kernels, batchnorm=self.batchnorm,
-                                        dropout=self.dropout,
-                                        activation_type=self.activation_type,
-                                        activation_params=self.activation_params))
+            if self.bottleneck and cur_in == cur_channels[-1]:
+                layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
+                                                      inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm,
+                                                      dropout=self.dropout,
+                                                      activation_type=self.activation_type,
+                                                      activation_params=self.activation_params))
+            else:
+                layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
+                                            kernel_sizes=residuals_kernels, batchnorm=self.batchnorm,
+                                            dropout=self.dropout,
+                                            activation_type=self.activation_type,
+                                            activation_params=self.activation_params))
             layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
             iterator = iterator + self.pool_every
             cur_in = cur_channels[-1]
