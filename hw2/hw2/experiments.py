@@ -160,19 +160,28 @@ def cnn_experiment(
 
     channels = [block_filter for block_filter in filters_per_layer for _ in range(layers_per_block)]
 
-    model_parmas = dict(
-        in_size=in_size, out_classes=out_size, channels=channels,
-        pool_every=pool_every, hidden_dims=hidden_dims,
-        pooling_params=pooling_params, conv_params=conv_params
-    )
+    if model_type == "ycn":
+        model_parmas = dict(
+            in_size=in_size, out_classes=out_size, channels=channels,
+            pool_every=pool_every, hidden_dims=hidden_dims,
+            pooling_params=pooling_params, conv_params=conv_params,
+            batchnorm=True, dropout=0.1,
+            bottleneck=True
+        )
+    else:
+        model_parmas = dict(
+            in_size=in_size, out_classes=out_size, channels=channels,
+            pool_every=pool_every, hidden_dims=hidden_dims,
+            pooling_params=pooling_params, conv_params=conv_params
+        )
 
 
     if model_type == "cnn":
-        model = CNN(**model_parmas)
+        model = CNN(**model_parmas).to(device)
     elif "resnet":
-        model = ResNet(**model_parmas)
+        model = ResNet(**model_parmas).to(device)
     else:   ## else ycn
-        return "two"
+        model = YourCNN(**model_parmas).to(device)
 
     classifier_model = ArgMaxClassifier(model=model)
 

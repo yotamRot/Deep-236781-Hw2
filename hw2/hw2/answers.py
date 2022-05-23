@@ -287,6 +287,19 @@ An equation: $e^{i\pi} -1 = 0$
 part3_q3 = r"""
 **Your answer:**
 
+2. Generalization error is a measure of error resulting from the fact that we use sample as a substitute for the true 
+distribution and our inability to find the optimal parametric model.
+As we can see from a plots obviously we did not predict perfectly the validation set, but the result over validation set
+(unseen data) in general are not so different from train results until some epoch. 
+From some epoch we can see that our model started to over fit the train data because validation result decrease comparing train result.
+ So from that point generalization error got bigger because of the fact that we train the model over sample and not using real distribution.
+To conclude our model was able to generalize result over new data quite good and we did not over fitted too much over the train set 
+ so our generalization error is not high.
+   
+   
+3. Approximation error is a measure of error resulting from the fact that we limited our self to some family of models, where the 
+Where the optimal model may not be found.
+    
 
 Write your answer using **markdown** and $\LaTeX$:
 ```python

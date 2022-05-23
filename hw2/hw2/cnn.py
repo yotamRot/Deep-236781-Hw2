@@ -348,13 +348,10 @@ class ResNet(CNN):
                                             activation_type=self.activation_type,
                                             activation_params=self.activation_params))
             layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
-            # print(iterator)
             iterator = iterator + self.pool_every
             cur_in = cur_channels[-1]
             cur_channels = self.channels[iterator:iterator + self.pool_every]
 
-        # print(iterator)
-        # print(len(self.channels))
         if iterator < len(self.channels):
             cur_channels = self.channels[iterator:]
             residuals_kernels = len(cur_channels) * [3]
@@ -376,17 +373,32 @@ class ResNet(CNN):
 
 
 class YourCNN(CNN):
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self,
+            in_size,
+            out_classes,
+            channels,
+            pool_every,
+            hidden_dims,
+            batchnorm=True,
+            dropout=0.5,
+            bottleneck: bool = False,
+            **kwargs,
+    ):
         """
         See CNN.__init__
         """
-        super().__init__(*args, **kwargs)
-
+        super().__init__(
+            in_size, out_classes, channels, pool_every, hidden_dims, **kwargs
+        )
+        self.batchnorm = batchnorm
+        self.dropout = dropout
+        self.bottleneck = bottleneck
         #     # TODO: Add any additional initialization as needed.
         #     # ====== YOUR CODE: ======
-        print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA NEED TO IMP YourCNN")
 
-    #     raise NotImplementedError()
+
+
     #     # ========================
     #
     # # TODO: Change whatever you want about the CNN to try to
@@ -394,5 +406,47 @@ class YourCNN(CNN):
     # #  For example, add batchnorm, dropout, skip connections, change conv
     # #  filter sizes etc.
     # # ====== YOUR CODE: ======
-    print("BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA NEED TO DO YourCNN")
-    # ========================
+    def _make_feature_extractor(self):
+        in_channels, in_h, in_w, = tuple(self.in_size)
+
+        layers = []
+        residuals_kernels = self.pool_every * [3]
+        iterator = 0
+        cur_in = in_channels
+        cur_channels = self.channels[:self.pool_every]
+        while iterator <= len(self.channels) - self.pool_every:
+            if self.bottleneck and cur_in == cur_channels[-1]:
+                layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
+                                                      inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm,
+                                                      dropout=self.dropout,
+                                                      activation_type=self.activation_type,
+                                                      activation_params=self.activation_params))
+            else:
+                layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
+                                            kernel_sizes=residuals_kernels, batchnorm=self.batchnorm,
+                                            dropout=self.dropout,
+                                            activation_type=self.activation_type,
+                                            activation_params=self.activation_params))
+            layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+            iterator = iterator + self.pool_every
+            cur_in = cur_channels[-1]
+            cur_channels = self.channels[iterator:iterator + self.pool_every]
+
+        if iterator < len(self.channels):
+            cur_channels = self.channels[iterator:]
+            residuals_kernels = len(cur_channels) * [3]
+            if self.bottleneck and cur_in == cur_channels[-1]:
+                layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
+                                            inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm, dropout=self.dropout,
+                                            activation_type=self.activation_type, activation_params=self.activation_params))
+            else:
+                layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
+                                            kernel_sizes=residuals_kernels, batchnorm=self.batchnorm,
+                                            dropout=self.dropout,
+                                            activation_type=self.activation_type,
+                                            activation_params=self.activation_params))
+
+        # ========================
+        seq = nn.Sequential(*layers)
+        return seq
+        # ========================
