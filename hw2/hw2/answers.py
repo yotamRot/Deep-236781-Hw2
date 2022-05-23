@@ -206,7 +206,23 @@ Therefore the main difference is that gradient decent is a method to find the mi
 efficient way that might be used by gradient decent to find the direction to the minimum efficiently from a given 
 location.
 
+2. Both gradient descent and stochastic gradient descent are optimization algorithms to find the minimum of function.
 
+The main difference is that **gradient descent** take in to account **all samples** in the training set for updating 
+parameter in some iteration, while in **stochastic gradient descent** we are using **one or subset of training samples**
+from the training set for updating a parameter in some iteration.
+The Advantage of SGD is that it can escape more easily from local minima.
+
+Furthermore SGD will be more efficient because less calculation is made but it will be more noisy because we are not 
+taking into account all samples
+
+3. SGD is used more often because it has the following benefits:
+
+- Faster because its less calculation is done in each iteration.
+
+- Can be used for large training sets because we dont need to save all data in memory in each iteration.
+
+- As we have learn the nosiness of SGD helps to escape local minima.
 
 """
 
@@ -261,52 +277,56 @@ def part3_optim_hp():
 part3_q1 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
-"""
-
-part3_q2 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
-"""
-
-part3_q3 = r"""
-**Your answer:**
+1. Optimization error is a measure of error resulting from not finding the exact minimizer for training data loss.
+As we can see from plots we reached pretty good results in manner of lost and acc. 
+Results are not perfect so we might reached local minima but still global minima is not much deeper the one optimizer found.
+So our optimization error is not high.
 
 2. Generalization error is a measure of error resulting from the fact that we use sample as a substitute for the true 
 distribution and our inability to find the optimal parametric model.
 As we can see from a plots obviously we did not predict perfectly the validation set, but the result over validation set
 (unseen data) in general are not so different from train results until some epoch. 
 From some epoch we can see that our model started to over fit the train data because validation result decrease comparing train result.
- So from that point generalization error got bigger because of the fact that we train the model over sample and not using real distribution.
+So from that point generalization error got bigger because of the fact that we train the model over sample and not using real distribution.
 To conclude our model was able to generalize result over new data quite good and we did not over fitted too much over the train set 
  so our generalization error is not high.
-   
-   
-3. Approximation error is a measure of error resulting from the fact that we limited our self to some family of models, where the 
-Where the optimal model may not be found.
     
+3. Approximation error is a measure of error resulting from the fact that we limited our self to some family of models,
+where the optimal model may not be found.
+As we can see from plot we got pretty good result meaning that our model was not so far from optimal one.
+But when we look at decision boundary plot, we can see that there are some areas in which we are mistaken
+(mistaken for inputs that have similar features) therefore approximation error that we do have is probably caused 
+by the fact that our model could not identify this "area" of true labels.
+"""
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+part3_q2 = r"""
+**Your answer:**
+
+According to the train confusion matrix we can see that the FNR is the common kind of mistake.
+Therefore when we apply the model on the validation data which is noisier we expect to get more FNR then FPR.
+That because we knew that the FNR was bigger then the FPR in the training phase so it will increase using noisier unseen data. 
+
+"""
+
+part3_q3 = r"""
+**Your answer:**
+
+When we choose the optimal threshold above it was important for us to decrease the sum of the FNR and FPR because both 
+were equally important.
+
+A. In this scenario we know that the disease is not lethal therefore a patient can be with the disease and it wont be so bad.
+We have to remember that our goal is to reduce the cost of the tests Therefore we prefer to have more sick patient that
+was classified 
+as not sick (FNR) then Patient that will predict as sick and after the expensive test will be found not sick (FPR).
+All of this is because that the disease is not lethal so we would like to **decrease the FPR** the this is how we will
+choose the threshold.
+
+
+B. Obviously in this scenario since we want to keep people alive because life as no price, we would prefer to classify a
+healthy people as sick. Also an important fact that we know is that the expansive tests are involve **high risk to the patient**
+so sending healthy person to this test is something we would like to avoid (because we care about life).
+To conclude in this case both FPR and FNR are important with the same weight so we would use the same method that we 
+choose above, **same optimal point** on the ROC curve. 
 
 """
 
