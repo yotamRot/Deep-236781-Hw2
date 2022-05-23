@@ -178,7 +178,7 @@ def cnn_experiment(
 
     if model_type == "cnn":
         model = CNN(**model_parmas).to(device)
-    elif "resnet":
+    elif model_type == "resnet":
         model = ResNet(**model_parmas).to(device)
     else:   ## else ycn
         model = YourCNN(**model_parmas).to(device)
