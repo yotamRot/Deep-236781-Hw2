@@ -334,14 +334,35 @@ choose above, **same optimal point** on the ROC curve.
 part3_q4 = r"""
 **Your answer:**
 
+1. As we can see at the results while the depth is fixed we are improving in general our test accuracy while increasing 
+the width of the model. Furthermore we can see that the decision boundary is getting more curvy.
+In depth 1 we can see that the result is getting better all the way as we are increasing the width of the model, because 
+as we have learned the model become more expressive and can generalize complex data in a better way.
+While in depth 2, 4 we have reach the peak in low width value and we dont get improvement afterwards meaning that our
+model was expressive enough in early stage.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. As we can when the model is becoming more complex until a certain point we get better result because the model is 
+more expressive and can represent a complex function but after that point we might start to over-fit to our train set 
+therefore the results are getting worse. In width 2 we can see the improvement in a clear way (as the depth increase the
+result is better), while in the other width the increasing of the depth cause the model to be more complex which case 
+to over-fit and the decrease in accuracy. As we can see in row 2,3,4 the best result is not the most complex model 
+(in row 3 and 4 we are getting to the best result in the first depth because its expressive enough).
 
+3.
+
+depth=1, width=32 and depth=4, width=8: The better test result is for depth=1, width=32
+
+depth=1, width=128 and depth=4, width=32: The better test result is for depth=1, width=128
+
+for both of them we can explain that the result was better in the wider networks the following way. 
+Wider networks are very good at memorization and deeper are better in generalization. So in our model in the conflict between memorization and 
+generalization the wider model achieve the best result because although the fact that it generalize worse, it was less
+affective.
+
+
+4. Yes as we can see in all the tests we got better results using the optimal threshold. This happened because we choose 
+this threshold in a way to minimize both FNR and FPR over the validation set.
+Since the sets was selected randomly we got the improvement in the test set thanks to the optimal threshold.
 """
 # ==============
 # Part 4 (CNN) answers
@@ -369,14 +390,39 @@ def part4_optim_hp():
 
 part4_q1 = r"""
 **Your answer:**
+1. Number of parameters after each convolution is:
 
+ $K \cdot (C_in \cdot F^2 + 1) = (channels_out \cdot ((channels_in \cdot width \cdot height) + 1)$
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Example 1 - Regular  block
+    First Conv layer:
+    
+   $ num of parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
+   
+    Second Conv layer:
+    
+   $ num of parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
+   
+   So in total $ num of parameters = 590,080 \cdot 2 = 1,180,160$
+   
+Example 2 - BottleNeck block
+
+    First Conv layer:
+    
+   $ num of parameters = 64 \cdot ((256 \cdot 1 \cdot 1) + 1) = 16,448 $
+   
+    Second Conv layer:
+    
+   $ num of parameters = 64 \cdot ((64 \cdot 3 \cdot 3) + 1) = 36,928 $
+   
+   Third Conv layer:
+   
+   $ num of parameters = 256 \cdot ((64 \cdot 1 \cdot 1) + 1) = 16,640 $
+   
+   So in total $ num of parameters = 16,448 + 36,928 + 16,640 = 70,016 $
+   
+
+    
 
 """
 

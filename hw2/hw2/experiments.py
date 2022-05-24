@@ -46,9 +46,6 @@ def mlp_experiment(
     #  Note: use print_every=0, verbose=False, plot=False where relevant to prevent
     #  output from this function.
     # ====== YOUR CODE: ======
-    torch.manual_seed(seed)
-    #
-    # hp_arch = part3_arch_hp()
     hp_arch = dict(
             n_layers=depth,
             hidden_dims=width,
