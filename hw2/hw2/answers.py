@@ -228,6 +228,21 @@ taking into account all samples
 
 - As we have learn the nosiness of SGD helps to escape local minima.
 
+
+4. 1.Yes both options GD and given suggestion will produce equal gradient. This will happen because of the way forward 
+and backpropagation stages depend on each other. First we do forward pass calculation and save all values. Afterwards 
+we start running backpropagation to calculate the gradient. Gradient values depends on forward stage calculation but 
+since we already made those calculations all information needed to calculate gradient already exists. New suggestion 
+will give same gradient because although forward pass it done in multiple steps it is finished before starting 
+backpropagation. So when we start backpropagation all values required already exists and network is in same as if we 
+were using Normal GD. 
+
+2. As explained above since backpropagation stage calculation depends on forward pass calculation related to all data 
+after each forward batch we still need to remember it's calculation in the network. Therefore we will need to remember 
+a lot of data related to hidden layers variables. So although we did not save all dataset in memory we needed to save 
+a lot of data related to our model since backpropagation needed to use him because it depends on him.
+
+
 """
 
 
