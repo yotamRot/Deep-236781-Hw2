@@ -421,9 +421,29 @@ Example 2 - BottleNeck block
    
    So in total $ num of parameters = 16,448 + 36,928 + 16,640 = 70,016 $
    
-
+   
+   To conclude we can see that in the **bottleneck there are fewer parameters**
     
-
+    
+    2. We know that FLOPs are basic math operations and RELU activation function.
+    To calculate one convolution layer between ${C_in,H_in,W_in}$ to $C_out,H_out,W_out$ we have  
+    $ 2\cdot c_in \codt k^2 \cdot c_out \cdot W_out \cdot H_out$ floating point operations,
+    the 2 is for both sum and mul operation witch are require in convolution.
+    Also activation function (RELU) of each layer require $H_out \cdot W_out$ FLOPs.
+    We can see that for the regular block there are alot more FLOPs then the bottleneck block.
+    Therefore the **bottleneck is much lighter in FLOPs**.
+    
+    3. 
+    **Spatial**
+    In the **regular block** we have two convolution layers of 3x3 therefore the respective field is 5x5.
+       In the **bottleneck block** we have two convolution layers of 1x1 and one convolution layer of 3x3 therefore the
+       respective field is 3x3. We can conclude that the **regular block combine the input better in terms of spatial**.
+       
+       
+       **Across feature map**
+       Since we project in **bottleneck block** the first layer to smaller dimension, not all inputs has the same 
+       influence across feature map, on the other hand in the **regular block** since we don't project the input have 
+       the same influence across feature map. 
 """
 
 # ==============

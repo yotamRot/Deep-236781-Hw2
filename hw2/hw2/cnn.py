@@ -383,22 +383,22 @@ class YourCNN(CNN):
             batchnorm=True,
             dropout=0.5,
             bottleneck=False,
+            pooling_params=dict(kernel_size=2),
+            conv_params=dict(kernel_size=3, padding=1),
             **kwargs,
     ):
         """
         See CNN.__init__
         """
 
+
+        #     # TODO: Add any additional initialization as needed.
+        #     # ====== YOUR CODE: ======
         self.batchnorm = batchnorm
         self.dropout = dropout
         self.bottleneck = bottleneck
-        super().__init__(
-            in_size, out_classes, channels, pool_every, hidden_dims, **kwargs
-        )
-        #     # TODO: Add any additional initialization as needed.
-        #     # ====== YOUR CODE: ======
-
-
+        super().__init__(in_size, out_classes, channels, pool_every, hidden_dims, conv_params=conv_params,
+                         pooling_params=pooling_params, **kwargs)
 
     #     # ========================
     #
