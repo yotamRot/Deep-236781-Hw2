@@ -30,8 +30,11 @@ So the matrix would **not be sparse** because we have a connection between every
 Then we will get a weight parameter (non zero value) in each element in jacobian.
 
 C. 
-Yes we have to materialize this jacobian because according to chain rule: $\delta\mat{X} =\pderiv{L}{\mat{Y}}\cdot\pderiv{\mat{Y}}{\mat{X}}$
-So as we can see although $\pderiv{L}{\mat{Y}}$ is given, $\pderiv{\mat{Y}}{\mat{X}}$ is still required to calculate $\delta\mat{X}$
+No we don't have to materialize this jacobian.
+According to matrix multiplation and chain rules $\delta\mat{X} =\pderiv{L}{\mat{Y}}W^T$
+Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we know both $\pderiv{L}{\mat{Y}}$ and $W^T$
+
+
 
 2.
 
@@ -57,8 +60,9 @@ represents connection between same Yi and some X will not be zero.
 So since many elements do not hold this connection we will get a lot of zeroes.
 
 C. 
-Yes we have to materialize this jacobian because according to chain rule: $\delta\mat{W} =\pderiv{L}{\mat{Y}}\cdot\pderiv{\mat{Y}}{\mat{W}}$
-So as we can see although $\pderiv{L}{\mat{Y}}$ is given ${\mat{Y}}{\mat{W}}$ is still required to calculate $\delta\mat{W}$
+No we don't have to materialize this jacobian.
+According to matrix multiplation and chain rules $\delta\mat{W} = X^T\pderiv{L}{\mat{Y}}$
+Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we know both $\pderiv{L}{\mat{Y}}$ and $X^T$
 """
 
 part1_q2 = r"""
