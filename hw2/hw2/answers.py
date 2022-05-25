@@ -531,7 +531,7 @@ part5_q5 = r"""
     c. Residual Block - to prevent issues like had in previous experiments where the model was un trainable.
     
 2. As we can see in graphs the modifications gave us much better results then Exp1 result.
-    Best results was given for 
+    Best results was given for L=12 about 82% accuracy.
 
 """
 # ==============
