@@ -169,13 +169,14 @@ def cnn_experiment(
             pooling_params=pooling_params, conv_params=conv_params
         )
 
-
     if model_type == "cnn":
         model = CNN(**model_parmas).to(device)
+
     elif model_type == "resnet":
         model = ResNet(**model_parmas).to(device)
-    else:   ## else ycn
+    else:   # else ycn
         model = YourCNN(**model_parmas).to(device)
+        optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
 
     classifier_model = ArgMaxClassifier(model=model)
 

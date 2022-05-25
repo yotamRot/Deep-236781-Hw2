@@ -32,7 +32,8 @@ Then we will get a weight parameter (non zero value) in each element in jacobian
 C. 
 No we don't have to materialize this jacobian.
 According to matrix multiplation and chain rules $\delta\mat{X} =\pderiv{L}{\mat{Y}}W^T$
-Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we know both $\pderiv{L}{\mat{Y}}$ and $W^T$
+Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we 
+know both $\pderiv{L}{\mat{Y}}$ and $W^T$
 
 
 
@@ -61,8 +62,9 @@ So since many elements do not hold this connection we will get a lot of zeroes.
 
 C. 
 No we don't have to materialize this jacobian.
-According to matrix multiplation and chain rules $\delta\mat{W} = X^T\pderiv{L}{\mat{Y}}$
-Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we know both $\pderiv{L}{\mat{Y}}$ and $X^T$
+According to matrix multiplication and chain rules $\delta\mat{W} = X^T\pderiv{L}{\mat{Y}}$
+Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we 
+know both $\pderiv{L}{\mat{Y}}$ and $X^T$
 """
 
 part1_q2 = r"""
@@ -305,10 +307,12 @@ So our optimization error is not high.
 distribution and our inability to find the optimal parametric model.
 As we can see from a plots obviously we did not predict perfectly the validation set, but the result over validation set
 (unseen data) in general are not so different from train results until some epoch. 
-From some epoch we can see that our model started to over fit the train data because validation result decrease comparing train result.
-So from that point generalization error got bigger because of the fact that we train the model over sample and not using real distribution.
-To conclude our model was able to generalize result over new data quite good and we did not over fitted too much over the train set 
- so our generalization error is not high.
+From some epoch we can see that our model started to over fit the train data because validation result decrease 
+comparing train result.
+So from that point generalization error got bigger because of the fact that we train the model over sample and not using
+real distribution.
+To conclude our model was able to generalize result over new data quite good and we did not over fitted too much over 
+the train set so our generalization error is not high.
     
 3. Approximation error is a measure of error resulting from the fact that we limited our self to some family of models,
 where the optimal model may not be found.
@@ -473,66 +477,61 @@ Example 2 - BottleNeck block
 
 part5_q1 = r"""
 **Your answer:**
+1. As we can see from the graph increasing the depth (L) doesn't necessarily improve for both values of K.
+with L=2 we get the best result therefore increasing the depth doesn't help to improve the results.
+with L=8,16 the model is not trainable -> will explain in the next section.
 
+2. **YES** for L=8,16 we get un trainable model and we believe that the cause of this was "vanishing gradient problem".
+This might happened in deep networks were the gradient is getting very close to 0 so the gradient information failed to
+reach the beginning of the network in back propagation process
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Suggestion for solving the problem:
+
+A. Residual block - skipping layers will help overcome this issue
+
+B. Batch normalization - will help the derivative to stay in good range
 
 """
 
 part5_q2 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+We can see from the graphs that while we increase K we get better results for L=2,4.
+For L=8 we are the same issue that we had in the previous experiment when the model was un trainable.
+And compare to the results in exp1_1 for the trainable model here we got a little improvement.
 
 """
 
 part5_q3 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+As we can see from the graph using **L=1** is the best result, the explanation is similar as was in experiment 1.1.
+After L=1 we get decrease in results and in L=3,4 the model getting too complex (many features) until its 
+un trainable (Probably vanishing gradient issue again).
+This is fit to the results that we get until now from the previous experiments.
 
 """
 
 part5_q4 = r"""
 **Your answer:**
 
+First of all we can see that we don't have the issue of un trainable model. we believe that this happened because resnet
+is skipping connection as we suggested in question 1 part 2.
+Therefore we can use complex models and deeper networks and achieve better results compare to the previous experiments.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+Secondly, we got much better results in compare to previous experiments probably because what we mentioned above.
+ 
 """
 
 part5_q5 = r"""
 **Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+1. In YourCnn we decided to use the following:
+    a. Dropout - To prevent over-fit over our train set, we played with it's value until we found an optimal one.
+    b. Batch normalization - to make our learning process faster and more stable.
+    c. Residual Block - to prevent issues like had in previous experiments where the model was un trainable.
+    
+2. As we can see in graphs the modifications gave us much better results then Exp1 result.
+    Best results was given for 
 
 """
 # ==============
