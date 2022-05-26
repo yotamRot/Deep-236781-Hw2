@@ -30,6 +30,7 @@ So the matrix would **not be sparse** because we have a connection between every
 Then we will get a weight parameter (non zero value) in each element in jacobian.
 
 C. 
+
 No we don't have to materialize this jacobian.
 According to matrix multiplation and chain rules $\delta\mat{X} =\pderiv{L}{\mat{Y}}W^T$
 Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we 
@@ -61,6 +62,7 @@ represents connection between same Yi and some X will not be zero.
 So since many elements do not hold this connection we will get a lot of zeroes.
 
 C. 
+
 No we don't have to materialize this jacobian.
 According to matrix multiplication and chain rules $\delta\mat{W} = X^T\pderiv{L}{\mat{Y}}$
 Therefore instead of materialization the entire jacobian matrix we can just use use expression written above because we 
@@ -231,19 +233,24 @@ taking into account all samples
 - As we have learn the nosiness of SGD helps to escape local minima.
 
 
-4. 1.Yes both options GD and given suggestion will produce equal gradient. This will happen because of the way forward 
-and backpropagation stages depend on each other. First we do forward pass calculation and save all values. Afterwards 
-we start running backpropagation to calculate the gradient. Gradient values depends on forward stage calculation but 
-since we already made those calculations all information needed to calculate gradient already exists. New suggestion 
-will give same gradient because although forward pass it done in multiple steps it is finished before starting 
-backpropagation. So when we start backpropagation all values required already exists and network is in same as if we 
-were using Normal GD. 
+4. 
 
-2. As explained above since backpropagation stage calculation depends on forward pass calculation related to all data 
-after each forward batch we still need to remember it's calculation in the network. Therefore we will need to remember 
-a lot of data related to hidden layers variables. So although we did not save all dataset in memory we needed to save 
-a lot of data related to our model since backpropagation needed to use him because it depends on him.
+1.Yes both options GD and given suggestion will produce equal gradient. 
+This will happen because of the way forward and backpropagation stages depend on each other. 
+First we do forward pass calculation and save all values. Afterwards 
+we start running backpropagation to calculate the gradient.
+In regular GD gradient is calculated using backprop on loss function according to all dataset. 
+In current suggestion we will calculate gradient using backprop on the sum of losses of each batch.
+Knowing that gradient is a linear operation we can say that: 
+$(\sum \nabla L = \nabla \sum L)$ and therefore both expression are Equivalent.
+To conclude we can say both methods will produce equivalent gradient.
 
+2. 
+
+Backpropagation stage calculation in each stage depends on forward pass input related to stage. Therefore as we 
+implemented in this exercise we will need to remember input for each stage to use it later in the backprop of same 
+stage. Since data set is huge, a lot of data related to hidden layers variables needs to be kept. So although we did 
+not save all dataset in memory we needed to save a lot of data related to our model since backpropagation depends on it. 
 
 """
 
@@ -531,7 +538,7 @@ part5_q5 = r"""
     c. Residual Block - to prevent issues like had in previous experiments where the model was un trainable.
     
 2. As we can see in graphs the modifications gave us much better results then Exp1 result.
-    Best results was given for L=12 about 82% accuracy.
+    Best results was given for L=12 about 8%% accuracy!
 
 """
 # ==============
