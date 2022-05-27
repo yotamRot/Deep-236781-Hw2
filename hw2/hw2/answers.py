@@ -93,7 +93,7 @@ def part2_overfit_hp():
     wstd, lr, reg = 0, 0, 0
     # TODO: Tweak the hyperparameters until you overfit the small dataset.
     # ====== YOUR CODE: ======
-    wstd = 0.01
+    wstd = 0.02
     lr = 0.01
     reg = 0
     # ========================
@@ -235,7 +235,7 @@ taking into account all samples
 
 4. 
 
-1.Yes both options GD and given suggestion will produce equal gradient. 
+A.Yes both options GD and given suggestion will produce equal gradient. 
 This will happen because of the way forward and backpropagation stages depend on each other. 
 First we do forward pass calculation and save all values. Afterwards 
 we start running backpropagation to calculate the gradient.
@@ -245,7 +245,7 @@ Knowing that gradient is a linear operation we can say that:
 $(\sum \nabla L = \nabla \sum L)$ and therefore both expression are Equivalent.
 To conclude we can say both methods will produce equivalent gradient.
 
-2. 
+B. 
 
 Backpropagation stage calculation in each stage depends on forward pass input related to stage. Therefore as we 
 implemented in this exercise we will need to remember input for each stage to use it later in the backprop of same 
@@ -295,7 +295,7 @@ def part3_optim_hp():
     #    Loss classes in torch.nn or one of the loss functions from torch.nn.functional.
     # ====== YOUR CODE: ======
     lr = 0.001
-    weight_decay = 0.005
+    weight_decay = 0.001
     momentum = 0.9
     loss_fn = torch.nn.CrossEntropyLoss()
     # ========================
@@ -309,6 +309,7 @@ part3_q1 = r"""
 As we can see from plots we reached pretty good results in manner of lost and acc. 
 Results are not perfect so we might reached local minima but still global minima is not much deeper the one optimizer found.
 So our optimization error is not high.
+So to improve optimization error we can twick hyper parameters to see if we get better results.
 
 2. Generalization error is a measure of error resulting from the fact that we use sample as a substitute for the true 
 distribution and our inability to find the optimal parametric model.
@@ -320,6 +321,7 @@ So from that point generalization error got bigger because of the fact that we t
 real distribution.
 To conclude our model was able to generalize result over new data quite good and we did not over fitted too much over 
 the train set so our generalization error is not high.
+So to improve Generalization error we can use more values of dropout until we can reach the optimal value that least over-fit.
     
 3. Approximation error is a measure of error resulting from the fact that we limited our self to some family of models,
 where the optimal model may not be found.
@@ -327,6 +329,7 @@ As we can see from plot we got pretty good result meaning that our model was not
 But when we look at decision boundary plot, we can see that there are some areas in which we are mistaken
 (mistaken for inputs that have similar features) therefore approximation error that we do have is probably caused 
 by the fact that our model could not identify this "area" of true labels.
+So to improve Approximation error we can play with model parameters or maybe add some non linear feature to try get better results.
 """
 
 part3_q2 = r"""
@@ -420,60 +423,68 @@ def part4_optim_hp():
 
 part4_q1 = r"""
 **Your answer:**
-1. Number of parameters after each convolution is:
 
- $K \cdot (C_in \cdot F^2 + 1) = (channels_out \cdot ((channels_in \cdot width \cdot height) + 1)$
+1.
+ 
+Number of parameters after each convolution is:
+
+$K \cdot (C_in \cdot F^2 + 1) = (channels_out \cdot ((channels_in \cdot width \cdot height) + 1)$
 
 Example 1 - Regular  block
     First Conv layer:
     
-   $ num of parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
+   $  parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
    
-    Second Conv layer:
-    
-   $ num of parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
+   Second Conv layer:
+       $ parameters = 256 \cdot ((256 \cdot 3 \cdot 3) + 1) = 590,080 $
    
-   So in total $ num of parameters = 590,080 \cdot 2 = 1,180,160$
+   So in total $ parameters = 590,080 \cdot 2 = 1,180,160$
    
 Example 2 - BottleNeck block
 
-    First Conv layer:
+First Conv layer:
     
-   $ num of parameters = 64 \cdot ((256 \cdot 1 \cdot 1) + 1) = 16,448 $
+   $ parameters = 64 \cdot ((256 \cdot 1 \cdot 1) + 1) = 16,448 $
    
-    Second Conv layer:
+Second Conv layer:
     
-   $ num of parameters = 64 \cdot ((64 \cdot 3 \cdot 3) + 1) = 36,928 $
+   $ parameters = 64 \cdot ((64 \cdot 3 \cdot 3) + 1) = 36,928 $
    
-   Third Conv layer:
+Third Conv layer:
    
-   $ num of parameters = 256 \cdot ((64 \cdot 1 \cdot 1) + 1) = 16,640 $
+   $ parameters = 256 \cdot ((64 \cdot 1 \cdot 1) + 1) = 16,640 $
    
-   So in total $ num of parameters = 16,448 + 36,928 + 16,640 = 70,016 $
+So in total $ parameters = 16,448 + 36,928 + 16,640 = 70,016 $
+   
+To conclude we can see that in the **bottleneck there are fewer parameters**
+
+
+
+2. 
+
+We know that FLOPs are basic math operations and RELU activation function.
+To calculate one convolution layer between ${C_{in},H_{in},W_{in}}$ to $C_{out},H_{out},W_{out}$ we have  
+$ 2\cdot c_{in} \cdot k^2 \cdot c_{out} \cdot W_{out} \cdot H_{out}$ floating point operations,
+the 2 is for both sum and mul operation witch are require in convolution.
+Also activation function (RELU) of each layer require $H_{out} \cdot W_{out}$ FLOPs.
+We can see that for the regular block there are alot more FLOPs then the bottleneck block.
+Therefore the **bottleneck is much lighter in FLOPs**.
+
+
+
+3. 
+**Spatial**
+
+In the **regular block** we have two convolution layers of 3x3 therefore the respective field is 5x5.
+   In the **bottleneck block** we have two convolution layers of 1x1 and one convolution layer of 3x3 therefore the
+   respective field is 3x3. We can conclude that the **regular block combine the input better in terms of spatial**.
    
    
-   To conclude we can see that in the **bottleneck there are fewer parameters**
-    
-    
-    2. We know that FLOPs are basic math operations and RELU activation function.
-    To calculate one convolution layer between ${C_in,H_in,W_in}$ to $C_out,H_out,W_out$ we have  
-    $ 2\cdot c_in \codt k^2 \cdot c_out \cdot W_out \cdot H_out$ floating point operations,
-    the 2 is for both sum and mul operation witch are require in convolution.
-    Also activation function (RELU) of each layer require $H_out \cdot W_out$ FLOPs.
-    We can see that for the regular block there are alot more FLOPs then the bottleneck block.
-    Therefore the **bottleneck is much lighter in FLOPs**.
-    
-    3. 
-    **Spatial**
-    In the **regular block** we have two convolution layers of 3x3 therefore the respective field is 5x5.
-       In the **bottleneck block** we have two convolution layers of 1x1 and one convolution layer of 3x3 therefore the
-       respective field is 3x3. We can conclude that the **regular block combine the input better in terms of spatial**.
-       
-       
-       **Across feature map**
-       Since we project in **bottleneck block** the first layer to smaller dimension, not all inputs has the same 
-       influence across feature map, on the other hand in the **regular block** since we don't project the input have 
-       the same influence across feature map. 
+   **Across feature map**
+   
+   Since we project in **bottleneck block** the first layer to smaller dimension, not all inputs has the same 
+   influence across feature map, on the other hand in the **regular block** since we don't project the input have 
+   the same influence across feature map. 
 """
 
 # ==============

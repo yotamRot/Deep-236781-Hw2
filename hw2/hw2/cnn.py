@@ -84,15 +84,17 @@ class CNN(nn.Module):
         iteration = 1
         new_channels = self.channels
         new_channels.insert(0, in_channels)
-        # new_channels.insert(-1, self.out_classes)
+        act_func = ACTIVATIONS[self.activation_type](
+            **{**ACTIVATION_DEFAULT_KWARGS[self.activation_type], **self.activation_params})
+        pooling =POOLINGS[self.pooling_type](**self.pooling_params)
         for in_channels, out_channels in zip(new_channels, new_channels[1:]):
             layers.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, **self.conv_params))
             # Apply activation function after each conv
-            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            layers.append(act_func)
             #  Apply pooling to reduce dimensions after every P convolutions
             #  CONV->ACTs should exist at the end, without a POOL after them.
             if iteration % self.pool_every == 0:
-                layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
+                layers.append(pooling)
             iteration += 1
         # ========================
         seq = nn.Sequential(*layers)
@@ -206,22 +208,17 @@ class ResidualBlock(nn.Module):
             nn.Conv2d(in_channels=in_channels, out_channels=channels[0], kernel_size=kernel_sizes[0], padding=padding))
 
         for in_channel, out_channel, kernel_size in zip(channels, channels[1:], kernel_sizes[1:]):
-
             if dropout > 0:
                 layers_main.append(nn.Dropout2d(dropout))
-
             if batchnorm is True:
                 layers_main.append(nn.BatchNorm2d(in_channel))
-
             layers_main.append(activation)
-
             padding = kernel_size // 2
             layers_main.append(
                 nn.Conv2d(in_channels=in_channel, out_channels=out_channel, kernel_size=kernel_size,
                           padding=padding))
 
         self.main_path = nn.Sequential(*layers_main)
-
         if in_channels == channels[-1]:
             layers_shortcut = [nn.Identity()]
         else:
@@ -278,8 +275,6 @@ class ResidualBottleneckBlock(ResidualBlock):
 
         new_channels = [inner_channels[0]] + inner_channels + [in_out_channels]
         new_kernels = [1] + inner_kernel_sizes + [1]
-        # print(new_channels)
-        # print(new_kernels)
         super().__init__(in_channels=in_out_channels, channels=new_channels, kernel_sizes=new_kernels, **kwargs)
         # ========================
 
@@ -331,10 +326,6 @@ class ResNet(CNN):
         cur_in = in_channels
         cur_channels = self.channels[:self.pool_every]
         while iterator <= len(self.channels) - self.pool_every:
-            # print(f"{iterator} <= {len(self.channels)} - {self.pool_every}")
-            # print(f"cur in {cur_in}")
-            # print(f"cur channels {cur_channels}")
-            # print(cur_channels)
             if self.bottleneck and cur_in == cur_channels[-1]:
                 layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
                                                       inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm,
@@ -355,7 +346,6 @@ class ResNet(CNN):
         if iterator < len(self.channels):
             cur_channels = self.channels[iterator:]
             residuals_kernels = len(cur_channels) * [3]
-            # print(residuals_kernels)
             if self.bottleneck and cur_in == cur_channels[-1]:
                 layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
                                             inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm, dropout=self.dropout,
@@ -435,11 +425,6 @@ class YourCNN(CNN):
         if iterator < len(self.channels):
             cur_channels = self.channels[iterator:]
             residuals_kernels = len(cur_channels) * [3]
-        #     if self.bottleneck and cur_in == cur_channels[-1]:
-        #         layers.append(ResidualBottleneckBlock(in_out_channels=cur_in, inner_channels=cur_channels[1:-1],
-        #                                     inner_kernel_sizes=residuals_kernels[1:-1], batchnorm=self.batchnorm, dropout=self.dropout,
-        #                                     activation_type=self.activation_type, activation_params=self.activation_params))
-        #     else:
             layers.append(ResidualBlock(in_channels=cur_in, channels=cur_channels,
                                         kernel_sizes=residuals_kernels, batchnorm=self.batchnorm,
                                         dropout=self.dropout,

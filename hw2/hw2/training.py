@@ -278,8 +278,6 @@ class ClassifierTrainer(Trainer):
         self.optimizer.step()
         y_classify = self.model.classify(X)
         num_correct = int(((y == y_classify).sum()))
-        # print(num_correct)
-        # batch_loss = batch_loss.detach()
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -304,7 +302,6 @@ class ClassifierTrainer(Trainer):
             batch_loss = self.loss_fn(x_scores, y)
             y_classify = self.model.classify(X)
             num_correct = int(((y == y_classify).sum()))
-            # batch_loss = batch_loss.detach()
             # ========================
 
         return BatchResult(batch_loss, num_correct)
