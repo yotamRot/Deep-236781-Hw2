@@ -539,17 +539,30 @@ Therefore we can use complex models and deeper networks and achieve better resul
 
 Secondly, we got much better results in compare to previous experiments probably because what we mentioned above.
  
+ 
+We believe that middel L (L=16,L=4) are the optimal because it was the optimal parameter between making the model
+complex and too simple.
 """
 
 part5_q5 = r"""
 **Your answer:**
 1. In YourCnn we decided to use the following:
+
     a. Dropout - To prevent over-fit over our train set, we played with it's value until we found an optimal one.
+    
     b. Batch normalization - to make our learning process faster and more stable.
+    
     c. Residual Block - to prevent issues like had in previous experiments where the model was un trainable.
     
+    
 2. As we can see in graphs the modifications gave us much better results then Exp1 result.
-    Best results was given for L=12 about 8%% accuracy!
+
+    Best results was given for L=6 about **85.02%** accuracy!
+    This is a very huge improvement thanks to the changes we mention above!
+    
+    We believe that L=6 is the optimal because it was the optimal parameter between making the model
+    complex and too simple.
+    
 
 """
 # ==============
